@@ -42,7 +42,9 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold (
+    return WillPopScope(
+      onWillPop: _requestPop,
+      child: Scaffold (
       appBar: AppBar(
         backgroundColor: Colors.red,
         title: Text(_editedContact.name ?? "Novo Contato"),
@@ -50,7 +52,7 @@ class _ContactPageState extends State<ContactPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if(_editedContact.name.isNotEmpty) {
+          if(_editedContact !=null && _editedContact.name.isNotEmpty) {
             Navigator.pop(context, _editedContact);
           } else {
             FocusScope.of(context).requestFocus(_nameFocus);
@@ -109,6 +111,39 @@ class _ContactPageState extends State<ContactPage> {
           ],
         ),
       ),
+    )
     );
+  }
+
+  Future<bool>_requestPop() {
+    if(_userEdited) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Descartar Alterações?"),
+            content: Text("Se sair as alterações serão perdidas."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                }
+              ),
+              FlatButton(
+                child: Text("Sim"),
+                onPressed: (){
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        }
+      );
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 }
